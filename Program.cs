@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using ProdutosApi.Data;
 using ProdutosApi.Repositories;
@@ -20,6 +21,36 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.EnableSensitiveDataLogging();
         options.EnableDetailedErrors();
     }
+});
+
+var jwt = builder.Configuration.GetSection("JWT");
+
+builder.Services.AddControllers();
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwt["Key"]))
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SoFinanceiro", p =>
+        p.RequireClaim("setor", "Financeiro"));
+    
+    options.AddPolicy("FinanceiroOuAdmin", p =>
+        p.RequireAssertion(ctx => 
+            ctx.User.HasClaim("setor", "Financeiro") ||
+            ctx.User.HasClaim(ClaimTypes.Role, "Admin")));
 });
 
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
