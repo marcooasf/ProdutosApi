@@ -14,9 +14,13 @@ public class AuthController(IConfiguration config) : ControllerBase
 {
     private static readonly List<Usuario> _usuarios =
     [
+        new("Celia Csharp", "123", "Admin", "TI"),
+        new("Asaaf Asp.Net", "124", "Aluno", "Vendas"),
+        new("Jorge Java", "124", "Aluno", "Financeiro")
     ];
 
     [HttpPost("Login")]
+    public IActionResult Login(LoginDto req) 
     {
         var usuario = _usuarios.FirstOrDefault(u => req.login == u.User && req.password == u.Password);
         if (usuario is null) return Unauthorized("Login ou senha inválidos.");
@@ -24,7 +28,22 @@ public class AuthController(IConfiguration config) : ControllerBase
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, usuario.User),
+            new Claim(ClaimTypes.Role, usuario.Role),
+            new Claim("setor", usuario.Setor),
         };
         
+        var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Chave"]));
+        
+        var token = new JwtSecurityToken(
+            issuer: config["Jwt:Emissor"],
+            audience: config["Jwt:Publico"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: new SigningCredentials(chave, SecurityAlgorithms.HmacSha256)
+        );
+
+        return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
+
     }
+    public record LoginDto(string login, string password);
 }
