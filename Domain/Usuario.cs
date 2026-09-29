@@ -10,7 +10,6 @@ public class Usuario
     {
     }
 
-    public Usuario(string user, string password, string role)
     {
         User = user;
         Password = password;
