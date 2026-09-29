@@ -2,12 +2,35 @@ using Microsoft.EntityFrameworkCore;
 using ProdutosApi.Data;
 using ProdutosApi.Repositories;
 using ProdutosApi.Services;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var jwt = builder.Configuration.GetSection("Jwt");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwt["Issuer"],
+                ValidateAudience = true,
+                ValidAudience = jwt["Audience"],
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["key"])),
+                ClockSkew = TimeSpan.Zero
+            };
+        }
+    );
 
 var connectionString = builder.Configuration.GetConnectionString("Postgres")!;
 
