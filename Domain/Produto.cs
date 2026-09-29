@@ -8,4 +8,16 @@ public class Produto
     public decimal Preco { get; set; }
     public int Estoque { get; set; }
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+
+    public Produto()
+    {
+    }
+
+    public Produto(int id, string? descricao, decimal preco, int estoque)
+    {
+        Id = id;
+        Descricao = descricao;
+        Preco = preco;
+        Estoque = estoque;
+    }
 }

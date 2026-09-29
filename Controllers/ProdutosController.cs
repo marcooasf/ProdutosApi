@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdutosApi.DTOs;
 using ProdutosApi.Services;
@@ -13,10 +14,24 @@ public class ProdutosController : ControllerBase
 
     public ProdutosController(IProdutoService service) => _service = service;
 
-    [HttpGet]
+    [HttpGet("publico")]
     [ProducesResponseType(typeof(PagedResult<ProdutoResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<ProdutoResponse>>> Listar([FromQuery] ProdutoFiltro filtro, CancellationToken ct)
         => Ok(await _service.ListarAsync(filtro, ct));
+
+    [Authorize(Roles = "Aluno")]
+    [HttpGet("logado")]
+    public IActionResult Logado()
+    {
+        return Ok($"Olá, {User.Identity!.Name}");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin")]
+    public IActionResult Admin()
+    {
+        return Ok("Acesso do Admin.");
+    }
 
     [HttpGet("{id:int}", Name = "ObterProduto")]
     [ProducesResponseType(typeof(ProdutoResponse), StatusCodes.Status200OK)]
