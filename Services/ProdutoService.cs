@@ -35,7 +35,12 @@ public class ProdutoService : IProdutoService
             Descricao = request.Descricao?.Trim(),
             Preco = request.Preco,
             Estoque = request.Estoque,
-            CriadoEm = DateTime.UtcNow
+            CriadoEm = DateTime.UtcNow,
+            Tipo = request.Tipo.Trim(),
+            Zona = request.Zona.Trim(),
+            Profundidade = request.Profundidade,
+            Timbre = request.Timbre,
+            ImagemUrl = request.ImagemUrl?.Trim()
         };
 
         await _repository.AdicionarAsync(produto, ct);
@@ -55,6 +60,11 @@ public class ProdutoService : IProdutoService
         produto.Descricao = request.Descricao?.Trim();
         produto.Preco = request.Preco;
         produto.Estoque = request.Estoque;
+        produto.Tipo = request.Tipo.Trim();
+        produto.Zona = request.Zona.Trim();
+        produto.Profundidade = request.Profundidade;
+        produto.Timbre = request.Timbre;
+        produto.ImagemUrl = request.ImagemUrl?.Trim();
 
         await _repository.SalvarAsync(ct);
 
@@ -75,5 +85,6 @@ public class ProdutoService : IProdutoService
     }
 
     private static ProdutoResponse Mapear(Produto p) =>
-        new(p.Id, p.Nome, p.Descricao, p.Preco, p.Estoque, p.CriadoEm);
+        new(p.Id, p.Nome, p.Descricao, p.Preco, p.Estoque, p.CriadoEm,
+            p.Tipo, p.Zona, p.Profundidade, p.Timbre, p.ImagemUrl);
 }
