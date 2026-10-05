@@ -8,7 +8,14 @@ public class Produto
     public decimal Preco { get; set; }
     public int Estoque { get; set; }
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
-
+    
+    //Campos novos Projeto Sonar
+    public string Tipo { get; set; } = string.Empty;
+    public string Zona { get; set; } = string.Empty;
+    public int Profundidade { get; set; }   
+    public int Timbre { get; set; }
+    public string? ImagemUrl { get; set; }
+    
     public Produto()
     {
     }
