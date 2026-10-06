@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProdutosApi.Data;
 using ProdutosApi.Repositories;
 using ProdutosApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var jwt = builder.Configuration.GetSection("JWT");
 
-builder.Services.AddControllers();
-
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -56,6 +55,14 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -63,6 +70,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("Angular");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
