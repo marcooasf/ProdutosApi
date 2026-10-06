@@ -2,7 +2,7 @@
 
 public class ProdutoFiltro
 {
-    public const int TamanhoMaximoPagina = 10;
+    public const int TamanhoMaximoPagina = 50;
 
     private int _page = 1;
     private int _pageSize = 10;
@@ -29,6 +29,7 @@ public class ProdutoFiltro
     public string? Nome  { get; set; }
     public decimal? PrecoMinimo { get; set; }
     public decimal? PrecoMaximo { get; set; }
-    public string OrderBy { get; set; }
+    public string? Zona { get; set; }
+    public string? OrderBy { get; set; }
     public bool Desc { get; set; }
 }

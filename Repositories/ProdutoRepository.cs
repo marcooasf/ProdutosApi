@@ -19,6 +19,12 @@ public class ProdutoRepository : IProdutoRepository
             query = query.Where(p => EF.Functions.Like(p.Nome, $"%{termo}%"));
         }
 
+        if (!string.IsNullOrWhiteSpace(filtro.Zona))
+        {
+            var zona = filtro.Zona.Trim().ToLower();
+            query = query.Where(p => p.Zona.ToLower() == zona);
+        }
+
         if (filtro.PrecoMinimo.HasValue)
         {
             query = query.Where(p => p.Preco >= filtro.PrecoMinimo.Value);
@@ -39,7 +45,10 @@ public class ProdutoRepository : IProdutoRepository
             "nome" => filtro.Desc ? query.OrderByDescending(p => p.Nome) : query.OrderBy(p => p.Nome),
             "preco" => filtro.Desc ? query.OrderByDescending(p => p.Preco) : query.OrderBy(p => p.Preco),
             "estoque" => filtro.Desc ? query.OrderByDescending(p => p.Estoque) : query.OrderBy(p => p.Estoque),
-            "criadoem" => filtro.Desc ? query.OrderByDescending(p => p.CriadoEm) : query.OrderBy(p => p.CriadoEm)
+            "criadoem" => filtro.Desc ? query.OrderByDescending(p => p.CriadoEm) : query.OrderBy(p => p.CriadoEm),
+            "timbre" => filtro.Desc ? query.OrderByDescending(p => p.Timbre) : query.OrderBy(p => p.Timbre),
+            // Padrão do Sonar: da superfície para o fundo.
+            _ => filtro.Desc ? query.OrderByDescending(p => p.Profundidade) : query.OrderBy(p => p.Profundidade)
         };
         return ordenada.ThenBy(p => p.Id);
     }
